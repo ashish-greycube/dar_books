@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include dar_books *.css
+recursive-include dar_books *.csv
+recursive-include dar_books *.html
+recursive-include dar_books *.ico
+recursive-include dar_books *.js
+recursive-include dar_books *.json
+recursive-include dar_books *.md
+recursive-include dar_books *.png
+recursive-include dar_books *.py
+recursive-include dar_books *.svg
+recursive-include dar_books *.txt
+recursive-exclude dar_books *.pyc
