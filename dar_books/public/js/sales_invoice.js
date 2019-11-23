@@ -19,9 +19,23 @@ frappe.ui.form.on('Sales Invoice', {
 					if(!d.valuation_rate) d.valuation_rate = null;
 				}
 				frm.refresh_field("items");
-				frm.set_value('selling_price_list', undefined)
-				frm.set_value('selling_price_list', 'Selling')
-				frm.refresh_field("items");
+				var selling_price_list=frm.doc.selling_price_list;
+				if (selling_price_list!=undefined) {
+					frm.set_value('selling_price_list', undefined)
+					frm.set_value('selling_price_list', selling_price_list)
+					frm.refresh_field("items");	
+				} 
+				else 
+				{
+					frappe.db.get_single_value('Selling Settings', 'selling_price_list')
+						.then(selling_price_list => {
+							frm.set_value('selling_price_list', undefined)
+							frm.set_value('selling_price_list', selling_price_list)
+							frm.refresh_field("items");
+						})
+					
+				}
+				
 			}
 		});
 	},
