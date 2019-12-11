@@ -1,0 +1,54 @@
+{
+ "creation": "2019-12-11 15:42:30.878707",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "customer__qty",
+  "left_qty",
+  "sold_qty"
+ ],
+ "fields": [
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer__qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Customer  Qty",
+   "reqd": 1
+  },
+  {
+   "fieldname": "left_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Left Qty",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sold_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Sold Qty",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2019-12-11 15:43:45.422910",
+ "modified_by": "Administrator",
+ "module": "Dar Books",
+ "name": "Stock Receive and Invoice Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
