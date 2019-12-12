@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
+  "company",
   "customer",
   "customer_warehouse",
   "fetch_customer_warehouse_items",
@@ -92,10 +93,17 @@
    "fieldtype": "Table",
    "label": "Items",
    "options": "Stock Receive and Invoice Items"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2019-12-11 15:45:01.587517",
+ "modified": "2019-12-12 03:53:07.583550",
  "modified_by": "Administrator",
  "module": "Dar Books",
  "name": "Stock Receive and Invoice",
