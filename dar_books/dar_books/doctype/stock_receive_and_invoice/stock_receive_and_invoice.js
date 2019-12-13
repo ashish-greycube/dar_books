@@ -28,7 +28,7 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 	
 })
 
-frappe.ui.form.on('Stock Receive and Invoice Items', 
+frappe.ui.form.on('Stock Receive and Invoice Items',
 	"left_qty", function(frm, cdt, cdn) { // notice the presence of cdt and cdn
     // that means that child doctype and child docname are passed to function and hence you can know what 
    // row was modified and triggered
@@ -37,6 +37,15 @@ frappe.ui.form.on('Stock Receive and Invoice Items',
     // item is the row that the user is working with
     // to what you need to do and update it back
     var sold_qty = item.customer_qty - item.left_qty ;
-    item.sold_qty = sold_qty; // remember to refresh the field to see the changes in the UI'
-	
-});
+	if (sold_qty < 0)
+	{
+		alert("Left Quantity " + item.left_qty.toString() + " cannot be more than initial Customer Qty "+ item.customer_qty.toString() +" for Item : " + item.item_code);
+		item.left_qty = item.customer_qty
+	}
+	else
+	{
+	item.sold_qty = sold_qty; // remember to refresh the field to see the changes in the UI'
+	}
+	frm.refresh_field("items");
+	}
+);
