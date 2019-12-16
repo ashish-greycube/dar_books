@@ -21,6 +21,9 @@ class StockReceiveandInvoice(Document):
 			target.update_stock=1
 			target.set_warehouse=source.customer_warehouse
 			target.taxes_and_charges=source.sales_taxes_and_charges_template
+			taxes = get_taxes_and_charges('Sales Taxes and Charges Template', source.sales_taxes_and_charges_template)
+			for tax in taxes:
+				target.append('taxes', tax)			
 			target.flags.ignore_permissions = ignore_permissions
 			target.cost_center =source.cost_center
 			target.run_method("set_missing_values")
