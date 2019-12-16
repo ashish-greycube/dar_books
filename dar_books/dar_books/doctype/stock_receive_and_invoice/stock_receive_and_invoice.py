@@ -7,12 +7,23 @@ import frappe
 from frappe.model.document import Document
 from erpnext.utilities.product import get_price
 from frappe.model.mapper import get_mapped_doc
+from erpnext.controllers.accounts_controller import get_taxes_and_charges
+from frappe import _
 
 class StockReceiveandInvoice(Document):
 	def on_submit(self):
-		print(self.docstatus,'-------')
+	try:		
 		stockentry=self.make_stock_entry(source_name=self.name)
-		doclist=self.make_sales_invoice(source_name=self.name)
+		salesinvoice=self.make_sales_invoice(source_name=self.name)
+		frappe.msgprint(_("Stock Entry {0} & Sales Invoice {1} is created")
+					.format(stockentry, salesinvoice))		
+
+	except Exception as e:
+		if frappe.message_log:
+			frappe.message_log.pop()
+		frappe.db.rollback()
+		frappe.log_error(frappe.get_traceback())		
+
 
 
 	def make_sales_invoice(self,source_name, target_doc=None, ignore_permissions=True):
