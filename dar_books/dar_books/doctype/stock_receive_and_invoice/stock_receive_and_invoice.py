@@ -52,7 +52,8 @@ class StockReceiveandInvoice(Document):
 
 	def make_stock_entry(self,source_name, target_doc=None, ignore_permissions=True):
 		def set_missing_values(source, target):
-			target.purpose='Material Transfer'
+			target.stock_entry_type = "Material Transfer"
+			target.purpose =  "Material Transfer"			
 			target.from_warehouse=source.customer_warehouse
 			target.to_warehouse=source.target_warehouse
 			target.flags.ignore_permissions = ignore_permissions
