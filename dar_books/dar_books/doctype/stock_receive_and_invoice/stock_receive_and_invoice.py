@@ -12,17 +12,17 @@ from frappe import _
 
 class StockReceiveandInvoice(Document):
 	def on_submit(self):
-	try:		
-		stockentry=self.make_stock_entry(source_name=self.name)
-		salesinvoice=self.make_sales_invoice(source_name=self.name)
-		frappe.msgprint(_("Stock Entry {0} & Sales Invoice {1} is created")
-					.format(stockentry, salesinvoice))		
+		try:		
+			stockentry=self.make_stock_entry(source_name=self.name)
+			salesinvoice=self.make_sales_invoice(source_name=self.name)
+			frappe.msgprint(_("Stock Entry {0} & Sales Invoice {1} is created")
+						.format(stockentry, salesinvoice))		
 
-	except Exception as e:
-		if frappe.message_log:
-			frappe.message_log.pop()
-		frappe.db.rollback()
-		frappe.log_error(frappe.get_traceback())		
+		except Exception as e:
+			if frappe.message_log:
+				frappe.message_log.pop()
+			frappe.db.rollback()
+			frappe.log_error(frappe.get_traceback())		
 
 
 
