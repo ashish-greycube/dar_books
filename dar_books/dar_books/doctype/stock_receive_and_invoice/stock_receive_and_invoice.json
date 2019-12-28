@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "autoname": "naming_series:",
  "creation": "2019-12-11 15:36:58.892122",
  "description": "Agent will collect books from the Customer warehouse and system will create stock transfer for the left out quantity and bill for the sold qty",
@@ -9,12 +10,13 @@
   "naming_series",
   "company",
   "customer",
-  "customer_warehouse",
-  "fetch_customer_warehouse_items",
+  "scan_barcode_book",
   "column_break_5",
   "posting_date",
   "posting_time",
+  "customer_warehouse",
   "target_warehouse",
+  "fetch_customer_warehouse_items",
   "items_section",
   "items",
   "section_break_12",
@@ -125,10 +127,16 @@
   {
    "fieldname": "column_break_14",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "scan_barcode_book",
+   "fieldtype": "Data",
+   "label": "Scan Barcode"
   }
  ],
  "is_submittable": 1,
- "modified": "2019-12-14 00:21:50.954471",
+ "links": [],
+ "modified": "2019-12-28 07:44:45.778837",
  "modified_by": "Administrator",
  "module": "Dar Books",
  "name": "Stock Receive and Invoice",

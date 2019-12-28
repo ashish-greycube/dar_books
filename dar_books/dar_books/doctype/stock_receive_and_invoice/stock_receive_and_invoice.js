@@ -9,6 +9,32 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 			frm.set_value("posting_time", frappe.datetime.now_time());
 		}
 	},
+	refresh(frm) {
+		let scan_barcode_field = frm.get_field('scan_barcode_book');
+		if (scan_barcode_field) {
+			scan_barcode_field.set_value("");
+			scan_barcode_field.set_new_description("");
+
+			if (frappe.is_mobile()) {
+				if (scan_barcode_field.$input_wrapper.find('.input-group').length) return;
+
+				let $input_group = $('<div class="input-group">');
+				scan_barcode_field.$input_wrapper.find('.control-input').append($input_group);
+				$input_group.append(scan_barcode_field.$input);
+				$(`<span class="input-group-btn" style="vertical-align: top">
+						<button class="btn btn-default border" type="button">
+							<i class="fa fa-camera text-muted"></i>
+						</button>
+					</span>`)
+					.on('click', '.btn', () => {
+						frappe.barcode.scan_barcode().then(barcode => {
+							scan_barcode_field.set_value(barcode);
+						});
+					})
+					.appendTo($input_group);
+			}
+		}
+	},
 	validate(frm) {
 		if (frm.docstatus = 0) {
 			// to check if there is single sales invoice then sales fields are manadatory
@@ -67,7 +93,62 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 			}
 
 		});
+	},
+	scan_barcode_book: function(frm) {
+		let scan_barcode_field = frm.fields_dict["scan_barcode_book"];
+
+		let show_description = function(idx, exist = null) {
+			if (exist) {
+				scan_barcode_field.set_new_description(__('Row #{0}: is focused', [idx]));
+			} else {
+				scan_barcode_field.set_new_description(__(''));
+			}
+		}
+
+		if(frm.doc.scan_barcode_book) {
+			frappe.call({
+				method: "erpnext.selling.page.point_of_sale.point_of_sale.search_serial_or_batch_or_barcode_number",
+				args: { search_value: frm.doc.scan_barcode_book }
+			}).then(r => {
+				const data = r && r.message;
+				if (!data || Object.keys(data).length === 0) {
+					scan_barcode_field.set_new_description(__('Cannot find Item with this barcode'));
+					return;
+				}
+
+				let cur_grid = frm.fields_dict.items.grid;
+
+				let row_to_modify = null;
+				const existing_item_row = frm.doc.items.find(d => d.item === data.item_code);
+				const blank_item_row = frm.doc.items.find(d => !d.item_code);
+
+				if (existing_item_row) {
+					row_to_modify = existing_item_row;
+				} else if (blank_item_row) {
+					row_to_modify = blank_item_row;
+				}
+
+				if (row_to_modify==blank_item_row) {
+					// add new row
+					scan_barcode_field.set_value('');
+					show_description(0,null);
+					frappe.msgprint(__("Scaned Barcode") + ": " +scan_barcode_field.value+__(" doesn't exist in items table.") );
+					return false
+
+				}
+
+				show_description(row_to_modify.idx, row_to_modify.item);
+
+				frm.from_barcode = true;
+				var idx=row_to_modify.idx-1
+				frm.fields_dict["items"].grid.grid_rows[idx].activate();
+				frm.fields_dict["items"].grid.grid_rows[idx].get_field("left_qty").set_focus();				
+				scan_barcode_field.set_value('');
+			});
+		}
+		return false;
 	}
+
 });
 
 
