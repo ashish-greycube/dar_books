@@ -34,17 +34,18 @@ def get_items(warehouse, posting_date, posting_time, company):
 			with_valuation_rate=True)
 		income_account = frappe.db.get_value('Company', company, 'default_income_account')
 		if frappe.db.get_value("Item", d[0], "disabled") == 0:
-			res.append({
-				"item_code": d[0],
-				"warehouse": d[2],
-				"description":d[3],
-				"uom":d[4],
-				"income_account":income_account,
-				"qty": stock_bal[0],
-				"item_name": d[1],
-				"valuation_rate": stock_bal[1],
-				"current_qty": stock_bal[0],
-				"current_valuation_rate": stock_bal[1]
-			})
+			if stock_bal[0] > 0:
+				res.append({
+					"item_code": d[0],
+					"warehouse": d[2],
+					"description":d[3],
+					"uom":d[4],
+					"income_account":income_account,
+					"qty": stock_bal[0],
+					"item_name": d[1],
+					"valuation_rate": stock_bal[1],
+					"current_qty": stock_bal[0],
+					"current_valuation_rate": stock_bal[1]
+				})
 
 	return res

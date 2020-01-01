@@ -67,6 +67,9 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 
 		}
 	},
+	customer_warehouse(frm) {
+		frm.trigger('fetch_customer_warehouse_items')
+	},
 	fetch_customer_warehouse_items(frm) {
 		frappe.call({
 			method: "dar_books.api.get_items",
@@ -94,26 +97,35 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 
 		});
 	},
-	scan_barcode_book: function(frm) {
+	scan_barcode_book: function (frm) {
 		let scan_barcode_field = frm.fields_dict["scan_barcode_book"];
 
-		let show_description = function(idx, exist = null) {
+		let show_description = function (idx, exist = null, scanned_value = null) {
 			if (exist) {
-				scan_barcode_field.set_new_description(__('Row #{0}: is focused', [idx]));
-			} else {
-				scan_barcode_field.set_new_description(__(''));
+				scan_barcode_field.set_new_description(__('Row #{0}: Qty increased by 1', [idx]));
+			}
+			//doesn't exist in items table
+			else if (idx == 0 && exist == null) {
+				scan_barcode_field.set_new_description(__("Scaned Barcode {0} doesn't exist in below items table.", [scanned_value]));
+			}
+			//doesn't exist
+			else if (idx == -1 && exist == null) {
+				scan_barcode_field.set_new_description(__('Cannot find Item with barcode {0}', [scanned_value]));
 			}
 		}
 
-		if(frm.doc.scan_barcode_book) {
+		if (frm.doc.scan_barcode_book) {
 			frappe.call({
 				method: "erpnext.selling.page.point_of_sale.point_of_sale.search_serial_or_batch_or_barcode_number",
-				args: { search_value: frm.doc.scan_barcode_book }
+				args: {
+					search_value: frm.doc.scan_barcode_book
+				}
 			}).then(r => {
 				const data = r && r.message;
 				if (!data || Object.keys(data).length === 0) {
-					scan_barcode_field.set_new_description(__('Cannot find Item with this barcode'));
-					return;
+					scan_barcode_field.set_value('');
+					show_description(-1, null, scan_barcode_field.value)
+					return false;
 				}
 
 				let cur_grid = frm.fields_dict.items.grid;
@@ -127,28 +139,22 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 				} else if (blank_item_row) {
 					row_to_modify = blank_item_row;
 				}
-
-				if (row_to_modify==blank_item_row) {
-					// add new row
+				if (row_to_modify == blank_item_row) {
+					// scanned item not in child table
 					scan_barcode_field.set_value('');
-					show_description(0,null);
-					frappe.msgprint(__("Scaned Barcode") + ": " +scan_barcode_field.value+__(" doesn't exist in items table.") );
+					show_description(0, null, scan_barcode_field.value);
 					return false
-
 				}
-
 				show_description(row_to_modify.idx, row_to_modify.item);
-
 				frm.from_barcode = true;
-				var idx=row_to_modify.idx-1
-				frm.fields_dict["items"].grid.grid_rows[idx].activate();
-				frm.fields_dict["items"].grid.grid_rows[idx].get_field("left_qty").set_focus();				
+				var idx = row_to_modify.idx - 1
+				frappe.model.set_value(row_to_modify.doctype, row_to_modify.name, 'left_qty', (row_to_modify.left_qty || 0) + 1)
 				scan_barcode_field.set_value('');
+				return true;
 			});
 		}
 		return false;
 	}
-
 });
 
 
