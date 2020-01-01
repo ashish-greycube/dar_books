@@ -36,35 +36,22 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 		}
 	},
 	validate(frm) {
-		if (frm.docstatus = 0) {
-			// to check if there is single sales invoice then sales fields are manadatory
-			//alert("validate ");
-			var sales_exist = false;
+		if (frm.docstatus == 0) {
+			var sold_qty_more_than_zero = false;
 			$.each(frm.doc.items || [], function (i, d) {
-
 				if (d.sold_qty > 0) {
-					//alert("sales_item_exist");
-					//check if sales invoice will be created 
-					sales_exist = true;
-					return false;
+					sold_qty_more_than_zero=true
 				} else {
 					//nothing
 				}
-
 			});
-			frm.set_df_property("sales_taxes_and_charges_template", "reqd", true);
-			frm.set_df_property("cost_center", "reqd", true);
-			if (frm.sales_taxes_and_charges_template && frm.cost_center) {
-				// frappe.validated=true;
-				return true;
-			} {
-				// frappe.validated=false;
-				frm.refresh_field("cost_center");
-				frm.refresh_field("sales_taxes_and_charges_template");
-				return false;
-
+			if (sold_qty_more_than_zero == false) {
+				frm.set_df_property("sales_taxes_and_charges_template", "reqd", false);
+				frm.set_df_property("cost_center", "reqd", false);	
+			} else {
+				frm.set_df_property("sales_taxes_and_charges_template", "reqd", true);
+				frm.set_df_property("cost_center", "reqd", true);
 			}
-
 		}
 	},
 	customer_warehouse(frm) {
