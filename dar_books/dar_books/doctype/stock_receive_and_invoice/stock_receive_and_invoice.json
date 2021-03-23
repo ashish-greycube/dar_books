@@ -1,5 +1,4 @@
 {
- "actions": [],
  "autoname": "naming_series:",
  "creation": "2019-12-11 15:36:58.892122",
  "description": "Agent will collect books from the Customer warehouse and system will create stock transfer for the left out quantity and bill for the sold qty",
@@ -11,6 +10,8 @@
   "company",
   "customer",
   "customer_warehouse",
+  "fetch_option",
+  "stock_transfer_entry",
   "column_break_5",
   "posting_date",
   "posting_time",
@@ -127,11 +128,23 @@
    "fieldname": "scan_barcode_book",
    "fieldtype": "Data",
    "label": "Scan Barcode"
+  },
+  {
+   "fieldname": "fetch_option",
+   "fieldtype": "Select",
+   "label": "Fetch Option",
+   "options": "\nAll\nSpecific Stock Entry"
+  },
+  {
+   "depends_on": "eval:doc.fetch_option == \"Specific Stock Entry\"",
+   "fieldname": "stock_transfer_entry",
+   "fieldtype": "Link",
+   "label": "Stock Transfer Entry",
+   "options": "Stock Entry"
   }
  ],
  "is_submittable": 1,
- "links": [],
- "modified": "2020-01-01 07:49:54.011944",
+ "modified": "2021-03-23 16:02:23.665718",
  "modified_by": "Administrator",
  "module": "Dar Books",
  "name": "Stock Receive and Invoice",
@@ -173,6 +186,32 @@
    "read": 1,
    "report": 1,
    "role": "Accounts User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Stock Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
    "share": 1,
    "submit": 1,
    "write": 1
