@@ -56,6 +56,7 @@ doctype_js = {"Sales Invoice" : "public/js/sales_invoice.js"}
 
 # before_install = "dar_books.install.before_install"
 # after_install = "dar_books.install.after_install"
+after_migrate = "dar_books.hook_methods.after_migrate"
 
 # Desk Notifications
 # ------------------

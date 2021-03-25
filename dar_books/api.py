@@ -3,6 +3,16 @@ import frappe, erpnext
 import frappe.defaults
 from frappe import msgprint, _
 
+@frappe.whitelist()
+def get_stock_entry_items(stock_entry):
+	doc = frappe.get_doc('Stock Entry', stock_entry)
+	res = []
+	for d in doc.get('items'):
+		res.append({
+					"item_code": d.item_code,
+					"qty":d.qty
+				})
+	return res
 
 @frappe.whitelist()
 def get_items(warehouse, posting_date, posting_time, company):

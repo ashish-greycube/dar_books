@@ -8,6 +8,22 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 		if (frm.docstatus = 0) {
 			frm.set_value("posting_time", frappe.datetime.now_time());
 		}
+	
+		if (frm.doc.target_warehouse==undefined || frm.doc.target_warehouse=='')
+		frappe.db.get_value('User', frappe.user, 'default_target_warehouse_cf')
+		.then(r => {
+			if (r.message.default_target_warehouse_cf){
+				frm.set_value('target_warehouse', r.message.default_target_warehouse_cf)
+			}
+		})	
+		frm.set_query('stock_transfer_entry', () => {
+			return {
+				filters: {
+					stock_entry_type: 'Material Transfer',
+					to_warehouse:frm.doc.target_warehouse
+				}
+			}
+		})				
 	},
 	refresh(frm) {
 		let scan_barcode_field = frm.get_field('scan_barcode_book');
@@ -55,7 +71,48 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 		}
 	},
 	customer_warehouse(frm) {
-		frm.trigger('fetch_customer_warehouse_items')
+		if(frm.doc.fetch_option=='All' && frm.doc.customer_warehouse){
+			frm.trigger('fetch_customer_warehouse_items')
+
+		}		
+	},
+	fetch_option(frm) {
+		if(frm.doc.fetch_option=='All' && frm.doc.customer_warehouse){
+			frm.trigger('fetch_customer_warehouse_items')
+
+		}
+		else if(frm.doc.fetch_option=='Specific Stock Entry' && frm.doc.stock_transfer_entry){
+			frm.trigger('fetch_stock_entry_items')
+		}
+	},
+	stock_transfer_entry(frm) {
+		if(frm.doc.fetch_option=='Specific Stock Entry' && frm.doc.stock_transfer_entry){
+			frm.trigger('fetch_stock_entry_items')
+		}		
+	},
+	fetch_stock_entry_items(frm) {
+		frappe.call({
+			method: "dar_books.api.get_stock_entry_items",
+			args: {
+				stock_entry: frm.doc.stock_transfer_entry
+			},
+			callback: function (r) {
+				console.log(r.message)
+				var items = [];
+				frm.clear_table("items");
+				for (var i = 0; i < r.message.length; i++) {
+					var d = frm.add_child("items", {
+						item: r.message[i].item_code,
+						customer_qty: r.message[i].qty,
+						left_qty: 0,
+						sold_qty: r.message[i].qty
+					});
+					$.extend(d, r.message[i]);
+				}
+				frm.refresh_field("items");
+			}
+
+		});
 	},
 	fetch_customer_warehouse_items(frm) {
 		frappe.call({
@@ -67,7 +124,6 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 				company: frm.doc.company
 			},
 			callback: function (r) {
-				//console.log(r)
 				var items = [];
 				frm.clear_table("items");
 				for (var i = 0; i < r.message.length; i++) {
@@ -83,7 +139,7 @@ frappe.ui.form.on('Stock Receive and Invoice', {
 			}
 
 		});
-	},
+	},	
 	scan_barcode_book: function (frm) {
 		let scan_barcode_field = frm.fields_dict["scan_barcode_book"];
 
